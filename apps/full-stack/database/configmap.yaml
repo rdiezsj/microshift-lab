@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-init-script
+  namespace: full-stack
+data:
+  init.sql: |
+    create table if not exists tasks (
+      id serial primary key,
+      task text not null,
+      is_done boolean default false
+    );
+    insert into tasks (task) values ('Validar Storage 1TB'), ('Probar ArgoCD'), ('Estructura Granular OK');
+    
+    -- Configuración de seguridad para PostgREST
+    create role web_anon nologin;
+    grant usage on schema public to web_anon;
+    grant select, insert, update, delete on tasks to web_anon;
+    grant usage, select on sequence tasks_id_seq to web_anon;
