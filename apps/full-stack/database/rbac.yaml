@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: allow-anyuid-scc
+  namespace: full-stack
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  # Este es el rol predefinido en OpenShift que da acceso a la SCC "anyuid"
+  name: system:openshift:scc:anyuid
+subjects:
+  # Se lo aplicamos a la ServiceAccount "default" de este namespace
+  - kind: ServiceAccount
+    name: default
+    namespace: full-stack

@@ -7,6 +7,7 @@ resources:
   - database/configmap.yaml
   - database/deployment.yaml
   - database/service.yaml
+  - database/rbac.yaml
   - backend/deployment.yaml
   - backend/service.yaml
   - backend/route.yaml
