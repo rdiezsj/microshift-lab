@@ -32,3 +32,5 @@ spec:
               value: "public"
             - name: PGRST_DB_ANON_ROLE
               value: "web_anon"
+            - name: PGRST_OPENAPI_SERVER_PROXY_URI
+              value: "http://api-route-full-stack.apps.lab.local"
