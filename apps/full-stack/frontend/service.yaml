@@ -7,5 +7,6 @@ spec:
   selector:
     app: frontend-ui
   ports:
-    - port: 80
-      targetPort: 8080
+    - name: http-web # <--- AÑADE ESTO (El nombre)
+      port: 80 # El puerto del Servicio (ClusterIP)
+      targetPort: 8080 # El puerto del Contenedor
