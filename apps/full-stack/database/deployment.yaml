@@ -13,26 +13,33 @@ spec:
         app: postgres
     spec:
       containers:
-      - name: postgres
-        image: postgres:15
-        ports:
-        - containerPort: 5432
-        env:
-        - name: POSTGRES_DB
-          value: app_db
-        - name: POSTGRES_USER
-          value: app_user
-        - name: POSTGRES_PASSWORD
-          value: "password123"
-        volumeMounts:
-        - mountPath: /var/lib/postgresql/data
-          name: db-data
-        - mountPath: /docker-entrypoint-initdb.d
-          name: init-script
+        - name: postgres
+          image: docker.io/library/postgres:15
+          resources:
+            requests:
+              memory: "256Mi" # Reserva obligatoria
+              cpu: "100m" # 10% de un core
+            limits:
+              memory: "512Mi" # Si pasa de aquí, MicroShift lo reinicia
+              cpu: "500m" # Máximo medio core
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: app_db
+            - name: POSTGRES_USER
+              value: app_user
+            - name: POSTGRES_PASSWORD
+              value: "password123"
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: db-data
+            - mountPath: /docker-entrypoint-initdb.d
+              name: init-script
       volumes:
-      - name: db-data
-        persistentVolumeClaim:
-          claimName: db-pvc
-      - name: init-script
-        configMap:
-          name: db-init-script
+        - name: db-data
+          persistentVolumeClaim:
+            claimName: db-pvc
+        - name: init-script
+          configMap:
+            name: db-init-script

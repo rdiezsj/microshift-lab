@@ -13,10 +13,17 @@ spec:
         app: frontend-ui
     spec:
       containers:
-      - name: swagger-ui
-        image: swaggerapi/swagger-ui
-        ports:
-        - containerPort: 8080
-        env:
-        - name: BASE_URL
-          value: "/"
+        - name: swagger-ui
+          image: docker.io/swaggerapi/swagger-ui:latest
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "20m" # 2% de CPU
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 8080
+          env:
+            - name: BASE_URL
+              value: "/"

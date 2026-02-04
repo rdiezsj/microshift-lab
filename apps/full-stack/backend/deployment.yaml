@@ -13,15 +13,22 @@ spec:
         app: api-backend
     spec:
       containers:
-      - name: postgrest
-        image: postgrest/postgrest
-        ports:
-        - containerPort: 3000
-        env:
-        # La URI apunta al servicio de base de datos definido arriba
-        - name: PGRST_DB_URI
-          value: "postgres://app_user:password123@postgres-service:5432/app_db"
-        - name: PGRST_DB_SCHEMA
-          value: "public"
-        - name: PGRST_DB_ANON_ROLE
-          value: "web_anon"
+        - name: postgrest
+          image: docker.io/postgrest/postgrest:latest
+          resources:
+            requests:
+              memory: "64Mi" # Muy poquito
+              cpu: "50m" # 5% de CPU
+            limits:
+              memory: "256Mi" # Margen de seguridad
+              cpu: "300m"
+          ports:
+            - containerPort: 3000
+          env:
+            # La URI apunta al servicio de base de datos definido arriba
+            - name: PGRST_DB_URI
+              value: "postgres://app_user:password123@postgres-service:5432/app_db"
+            - name: PGRST_DB_SCHEMA
+              value: "public"
+            - name: PGRST_DB_ANON_ROLE
+              value: "web_anon"
