@@ -27,3 +27,6 @@ spec:
           env:
             - name: BASE_URL
               value: "/"
+              # Esta le dice a Swagger qué API cargar por defecto
+            - name: URL
+              value: "http://api-route-full-stack.apps.lab.local/"
