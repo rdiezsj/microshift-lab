@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: full-stack
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+      - name: keycloak
+        image: quay.io/keycloak/keycloak:24.0.1
+        args: ["start-dev"] # Modo desarrollo (más fácil para labs)
+        env:
+        - name: KEYCLOAK_ADMIN
+          value: "admin"
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          value: "admin"
+        - name: KC_PROXY
+          value: "edge"  # Importante: OpenShift hace de proxy TLS
+        - name: KC_HOSTNAME_STRICT
+          value: "false" # Permite que funcione sin configurar hostnames complejos
+        ports:
+        - name: http
+          containerPort: 8080
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"   # Java traga mucha RAM
+            cpu: "1000m"
+        volumeMounts:
+        - name: keycloak-data
+          mountPath: /opt/keycloak/data/h2
+      volumes:
+      - name: keycloak-data
+        persistentVolumeClaim:
+          claimName: keycloak-pvc

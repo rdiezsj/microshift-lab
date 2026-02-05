@@ -14,3 +14,7 @@ resources:
   - frontend/deployment.yaml
   - frontend/service.yaml
   - frontend/route.yaml
+  - iam/pvc.yaml
+  - iam/deployment.yaml
+  - iam/service.yaml
+  - iam/route.yaml
