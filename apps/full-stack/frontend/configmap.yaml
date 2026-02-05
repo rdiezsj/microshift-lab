@@ -14,10 +14,9 @@ data:
           SwaggerUIBundle.presets.apis,
           SwaggerUIStandalonePreset
         ],
-        plugins: [
-          SwaggerUIBundle.plugins.DownloadUrl
-        ],
         layout: "StandaloneLayout",
+        
+        // Redirección
         oauth2RedirectUrl: "http://frontend-route-full-stack.apps.lab.local/oauth2-redirect.html",
         
         onComplete: function() {
@@ -25,12 +24,12 @@ data:
           
           if (!spec.securityDefinitions) spec.securityDefinitions = {};
           
-          // Definición corregida para OAuth2 Standard Flow (Access Code)
+          // --- CAMBIO A IMPLICIT FLOW ---
+          // Este flujo es más robusto para laboratorios HTTP
           spec.securityDefinitions["keycloak"] = {
             "type": "oauth2",
-            "flow": "accessCode",
+            "flow": "implicit", 
             "authorizationUrl": "http://keycloak-route-full-stack.apps.lab.local/realms/lab-realm/protocol/openid-connect/auth",
-            "tokenUrl": "http://keycloak-route-full-stack.apps.lab.local/realms/lab-realm/protocol/openid-connect/token",
             "scopes": {
               "openid": "OpenID Connect",
               "profile": "User Profile"
@@ -41,13 +40,12 @@ data:
           
           ui.specActions.updateSpec(JSON.stringify(spec));
           
-          // AQUÍ ESTÁ LA CLAVE: Forzamos los scopes al iniciar
+          // Pre-rellenado de datos
           ui.initOAuth({
             clientId: "swagger-client",
             realm: "lab-realm",
             appName: "FullStack Lab",
-            scopes: "openid profile",  // <--- ESTO ELIMINA EL WARNING DE LOS LOGS
-            usePkceWithAuthorizationCodeGrant: true
+            scopes: "openid profile"
           });
         }
       });
