@@ -33,9 +33,9 @@ spec:
             - name: PGRST_DB_ANON_ROLE
               value: "web_anon"
             - name: PGRST_OPENAPI_SERVER_PROXY_URI
-              value: "http://api-route-full-stack.apps.lab.local"
+              value: "https://api-route-full-stack.apps.lab.local"
             - name: PGRST_SERVER_CORS_ALLOWED_ORIGINS
-              value: "http://frontend-route-full-stack.apps.lab.local"
+              value: "https://frontend-route-full-stack.apps.lab.local"
             - name: PGRST_JWT_SECRET
               value: '{"alg":"RS256", "e":"AQAB", "n":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwMFFjBmGcGnz6nYdyrQ9vsKTtP9wtKLctezYclrTY+sKpHVgcYhxRTeJ0gzdjJ3+pONZpLDDOEemHgfx2eNB8wVXA5jjEOr8cOCxJwDOXKBMwkV2WLPX6sewSgIDLGPCzIeJXeuOy3NrsxTO4Z8fXpAvL+7JnN8X5pvqAZljG1zUNIcWY8IBgGpg/PV1TKYUSo6OlHKNLjoXkhKkC8Eyo1wfUlDS7hMjZHajGOloJqU+LMgc5Pop6fV/rRNIQYSDWQxaGD7TsT+93Xo30B1NYC1NsHdmic8cicsNftgP9ow28/4uPzmOPGFV+pM85cs0O8sRTeJjpWuT2iNJou6xSQIDAQAB"}'
 

@@ -7,7 +7,7 @@ data:
   swagger-initializer.js: |
     window.onload = function() {
       window.ui = SwaggerUIBundle({
-        url: "http://api-route-full-stack.apps.lab.local/", 
+        url: "https://api-route-full-stack.apps.lab.local/", 
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
@@ -17,7 +17,7 @@ data:
         layout: "StandaloneLayout",
         
         // Redirección
-        oauth2RedirectUrl: "http://frontend-route-full-stack.apps.lab.local/oauth2-redirect.html",
+        oauth2RedirectUrl: "https://frontend-route-full-stack.apps.lab.local/oauth2-redirect.html",
         
         onComplete: function() {
           var spec = ui.specSelectors.specJson().toJS();
@@ -29,7 +29,7 @@ data:
           spec.securityDefinitions["keycloak"] = {
             "type": "oauth2",
             "flow": "implicit", 
-            "authorizationUrl": "http://keycloak-route-full-stack.apps.lab.local/realms/lab-realm/protocol/openid-connect/auth",
+            "authorizationUrl": "https://keycloak-route-full-stack.apps.lab.local/realms/lab-realm/protocol/openid-connect/auth",
             "scopes": {
               "openid": "OpenID Connect",
               "profile": "User Profile"

@@ -8,4 +8,7 @@ spec:
     kind: Service
     name: frontend-service
   port:
-    targetPort: http-web # <--- CAMBIA EL NÚMERO POR EL NOMBRE
+    targetPort: http-web
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

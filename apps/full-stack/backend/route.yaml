@@ -9,3 +9,6 @@ spec:
     name: api-service
   port:
     targetPort: http-api
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
