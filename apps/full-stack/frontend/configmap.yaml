@@ -18,40 +18,35 @@ data:
           SwaggerUIBundle.plugins.DownloadUrl
         ],
         layout: "StandaloneLayout",
-        
-        // Redirección OAUTH2
         oauth2RedirectUrl: "http://frontend-route-full-stack.apps.lab.local/oauth2-redirect.html",
         
         onComplete: function() {
           var spec = ui.specSelectors.specJson().toJS();
           
-          // --- CORRECCIÓN PARA OAS 2.0 ---
-          // PostgREST devuelve Swagger 2.0, así que usamos 'securityDefinitions'
-          // en lugar de 'components.securitySchemes'
-          
           if (!spec.securityDefinitions) spec.securityDefinitions = {};
           
+          // Definición corregida para OAuth2 Standard Flow (Access Code)
           spec.securityDefinitions["keycloak"] = {
             "type": "oauth2",
-            "flow": "accessCode", // En OAS 2.0 se llama 'flow', no 'flows'
+            "flow": "accessCode",
             "authorizationUrl": "http://keycloak-route-full-stack.apps.lab.local/realms/lab-realm/protocol/openid-connect/auth",
             "tokenUrl": "http://keycloak-route-full-stack.apps.lab.local/realms/lab-realm/protocol/openid-connect/token",
             "scopes": {
-              "openid": "OpenID Connect"
+              "openid": "OpenID Connect",
+              "profile": "User Profile"
             }
           };
           
-          // Aplicamos la seguridad a todas las rutas
-          spec.security = [{"keycloak": ["openid"]}];
+          spec.security = [{"keycloak": ["openid", "profile"]}];
           
-          // Actualizamos la UI
           ui.specActions.updateSpec(JSON.stringify(spec));
           
-          // Inicializamos el botón de Login
+          // AQUÍ ESTÁ LA CLAVE: Forzamos los scopes al iniciar
           ui.initOAuth({
             clientId: "swagger-client",
             realm: "lab-realm",
             appName: "FullStack Lab",
+            scopes: "openid profile",  // <--- ESTO ELIMINA EL WARNING DE LOS LOGS
             usePkceWithAuthorizationCodeGrant: true
           });
         }
