@@ -30,3 +30,12 @@ spec:
               # Esta le dice a Swagger qué API cargar por defecto
             - name: URL
               value: "http://api-route-full-stack.apps.lab.local/"
+
+          volumeMounts:
+          - name: config-volume
+            mountPath: /usr/share/nginx/html/swagger-initializer.js
+            subPath: swagger-initializer.js
+      volumes:
+        - name: config-volume
+          configMap:
+            name: swagger-config              

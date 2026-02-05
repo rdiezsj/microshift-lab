@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: swagger-config
+  namespace: full-stack
+data:
+  swagger-initializer.js: |
+    window.onload = function() {
+      window.ui = SwaggerUIBundle({
+        // 1. Tu ruta del API Backend
+        url: "http://api-route-full-stack.apps.lab.local/", 
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout",
+        
+        // 2. Tu ruta del Frontend + /oauth2-redirect.html
+        oauth2RedirectUrl: "http://frontend-route-full-stack.apps.lab.local/oauth2-redirect.html",
+        
+        onComplete: function() {
+          var spec = ui.specSelectors.specJson().toJS();
+          
+          if (!spec.components) spec.components = {};
+          
+          // 3. Definición de Seguridad (Aquí es donde forzamos la URL de Keycloak)
+          spec.components.securitySchemes = {
+            "keycloak": {
+              "type": "oauth2",
+              "description": "Logueate con Keycloak",
+              "flows": {
+                "implicit": {
+                  // TU RUTA DE KEYCLOAK EXACTA
+                  "authorizationUrl": "http://keycloak-route-full-stack.apps.lab.local/realms/lab-realm/protocol/openid-connect/auth",
+                  "scopes": {
+                    "openid": "OpenID Connect"
+                  }
+                }
+              }
+            }
+          };
+          
+          // Aplicar seguridad globalmente
+          spec.security = [{"keycloak": ["openid"]}];
+          
+          ui.specActions.updateSpec(JSON.stringify(spec));
+          
+          // 4. Datos para el botón de Login
+          ui.initOAuth({
+            clientId: "swagger-client",
+            realm: "lab-realm",
+            appName: "FullStack Lab",
+            usePkceWithAuthorizationCodeGrant: true
+          });
+        }
+      });
+    };
