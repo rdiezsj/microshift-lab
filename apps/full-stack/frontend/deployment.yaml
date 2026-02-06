@@ -29,7 +29,7 @@ spec:
               value: "/"
               # Esta le dice a Swagger qué API cargar por defecto
             - name: URL
-              value: "http://api-route-full-stack.apps.lab.local/"
+              value: "https://api-route-full-stack.apps.lab.local/"
 
           volumeMounts:
           - name: config-volume
