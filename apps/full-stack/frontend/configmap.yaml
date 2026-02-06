@@ -6,46 +6,66 @@ metadata:
 data:
   swagger-initializer.js: |
     window.onload = function() {
-      window.ui = SwaggerUIBundle({
-        url: "https://api-route-full-stack.apps.lab.local/", 
-        dom_id: '#swagger-ui',
-        deepLinking: true,
-        validatorUrl: null, // <--- ESTO DESACTIVA EL VALIDADOR EXTERNO
-        presets: [
-          SwaggerUIBundle.presets.apis,
-          SwaggerUIStandalonePreset
-        ],
-        layout: "StandaloneLayout",
-        oauth2RedirectUrl: "https://frontend-route-full-stack.apps.lab.local/oauth2-redirect.html",
-        
-        onComplete: function() {
-          var spec = ui.specSelectors.specJson().toJS();
-          
-          // Configuración específica para Swagger 2.0 (OAS 2.0)
+      // Definimos las URLs clave
+      var apiUrl = "https://api-route-full-stack.apps.lab.local/";
+      var authUrl = "https://keycloak-route-full-stack.apps.lab.local/realms/lab-realm/protocol/openid-connect/auth";
+
+      // 1. Hacemos el fetch manual de la definición de la API
+      fetch(apiUrl)
+        .then(response => {
+          if (!response.ok) throw new Error("Network response was not ok");
+          return response.json();
+        })
+        .then(spec => {
+          // 2. Modificamos el JSON puro ANTES de que Swagger lo toque
+          console.log("Definición API descargada. Inyectando seguridad...");
+
+          // Aseguramos compatibilidad con Swagger 2.0 (OAS 2.0)
           spec.securityDefinitions = {
             "keycloak": {
               "type": "oauth2",
               "flow": "implicit", 
-              "authorizationUrl": "https://keycloak-route-full-stack.apps.lab.local/realms/lab-realm/protocol/openid-connect/auth",
+              "authorizationUrl": authUrl,
               "scopes": {
                 "openid": "OpenID Connect",
                 "profile": "User Profile"
               }
             }
           };
-          
-          // Aplicar seguridad globalmente
+
+          // Aplicamos la seguridad a todos los endpoints
           spec.security = [{"keycloak": ["openid", "profile"]}];
-          
-          // Forzamos la actualización para limpiar cualquier residuo anterior
-          ui.specActions.updateSpec(JSON.stringify(spec));
-          
-          ui.initOAuth({
+
+          // 3. Inicializamos Swagger UI pasándole el objeto 'spec' directamente
+          // (Nota: Ya no usamos 'url', usamos 'spec')
+          window.ui = SwaggerUIBundle({
+            spec: spec, 
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            validatorUrl: null, // Desactivar validador externo
+            presets: [
+              SwaggerUIBundle.presets.apis,
+              SwaggerUIStandalonePreset
+            ],
+            layout: "StandaloneLayout",
+            oauth2RedirectUrl: "https://frontend-route-full-stack.apps.lab.local/oauth2-redirect.html"
+          });
+
+          // 4. Inicializamos OAuth
+          window.ui.initOAuth({
             clientId: "swagger-client",
             realm: "lab-realm",
             appName: "FullStack Lab",
             scopes: "openid profile"
           });
-        }
-      });
+        })
+        .catch(error => {
+          console.error("Error crítico cargando swagger:", error);
+          // Mostrar el error en pantalla si falla la carga inicial
+          document.getElementById('swagger-ui').innerHTML = `<div style="color:red; margin: 20px;">
+            <h3>Error cargando la API</h3>
+            <p>Verifica la consola del navegador (F12) para más detalles.</p>
+            <pre>${error.message}</pre>
+          </div>`;
+        });
     };
