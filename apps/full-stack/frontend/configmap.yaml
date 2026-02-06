@@ -7,7 +7,7 @@ data:
   swagger-initializer.js: |
     window.onload = function() {
       window.ui = SwaggerUIBundle({
-        url: "https://api-route-full-stack.apps.lab.local/", 
+        url: "https://api-route-full-stack.apps.lab.local/",
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
@@ -15,32 +15,35 @@ data:
           SwaggerUIStandalonePreset
         ],
         layout: "StandaloneLayout",
-        
-        // Redirección
         oauth2RedirectUrl: "https://frontend-route-full-stack.apps.lab.local/oauth2-redirect.html",
         
         onComplete: function() {
           var spec = ui.specSelectors.specJson().toJS();
           
-          if (!spec.securityDefinitions) spec.securityDefinitions = {};
+          // --- DETECCIÓN DE VERSIÓN Y CORRECCIÓN ---
+          // PostgREST devuelve OpenAPI 3.x, así que usamos la estructura 'components'
+          if (!spec.components) spec.components = {};
+          if (!spec.components.securitySchemes) spec.components.securitySchemes = {};
           
-          // --- CAMBIO A IMPLICIT FLOW ---
-          // Este flujo es más robusto para laboratorios HTTP
-          spec.securityDefinitions["keycloak"] = {
+          // Sintaxis OpenAPI 3.0 (flows en lugar de flow)
+          spec.components.securitySchemes["keycloak"] = {
             "type": "oauth2",
-            "flow": "implicit", 
-            "authorizationUrl": "https://keycloak-route-full-stack.apps.lab.local/realms/lab-realm/protocol/openid-connect/auth",
-            "scopes": {
-              "openid": "OpenID Connect",
-              "profile": "User Profile"
+            "flows": {
+              "implicit": {
+                "authorizationUrl": "https://keycloak-route-full-stack.apps.lab.local/realms/lab-realm/protocol/openid-connect/auth",
+                "scopes": {
+                  "openid": "OpenID Connect",
+                  "profile": "User Profile"
+                }
+              }
             }
           };
           
+          // Aplicamos la seguridad globalmente
           spec.security = [{"keycloak": ["openid", "profile"]}];
           
           ui.specActions.updateSpec(JSON.stringify(spec));
           
-          // Pre-rellenado de datos
           ui.initOAuth({
             clientId: "swagger-client",
             realm: "lab-realm",
