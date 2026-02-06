@@ -15,32 +15,50 @@ data:
           SwaggerUIStandalonePreset
         ],
         layout: "StandaloneLayout",
-        
-        // Redirección
         oauth2RedirectUrl: "https://frontend-route-full-stack.apps.lab.local/oauth2-redirect.html",
         
         onComplete: function() {
           var spec = ui.specSelectors.specJson().toJS();
           
-          if (!spec.securityDefinitions) spec.securityDefinitions = {};
+          // URL de autorización común (HTTPS)
+          var authUrl = "https://keycloak-route-full-stack.apps.lab.local/realms/lab-realm/protocol/openid-connect/auth";
           
-          // --- CAMBIO A IMPLICIT FLOW ---
-          // Este flujo es más robusto para laboratorios HTTP
+          // --- ESTRATEGIA HÍBRIDA ---
+          
+          // 1. Inyección para OpenAPI 3.0 (Formato Moderno - components)
+          if (!spec.components) spec.components = {};
+          if (!spec.components.securitySchemes) spec.components.securitySchemes = {};
+          
+          spec.components.securitySchemes["keycloak"] = {
+            "type": "oauth2",
+            "flows": {
+              "implicit": {
+                "authorizationUrl": authUrl,
+                "scopes": { "openid": "OpenID Connect", "profile": "User Profile" }
+              }
+            }
+          };
+
+          // 2. Inyección para Swagger 2.0 (Formato Antiguo - securityDefinitions)
+          // Esto asegura que el botón aparezca si PostgREST devuelve una spec antigua
+          if (!spec.securityDefinitions) spec.securityDefinitions = {};
           spec.securityDefinitions["keycloak"] = {
             "type": "oauth2",
             "flow": "implicit", 
-            "authorizationUrl": "https://keycloak-route-full-stack.apps.lab.local/realms/lab-realm/protocol/openid-connect/auth",
+            "authorizationUrl": authUrl,
             "scopes": {
               "openid": "OpenID Connect",
               "profile": "User Profile"
             }
           };
           
+          // 3. Aplicar seguridad globalmente (Funciona en ambos formatos)
           spec.security = [{"keycloak": ["openid", "profile"]}];
           
+          // Actualizar la especificación en caliente
           ui.specActions.updateSpec(JSON.stringify(spec));
           
-          // Pre-rellenado de datos
+          // Pre-rellenar el ClientID
           ui.initOAuth({
             clientId: "swagger-client",
             realm: "lab-realm",
