@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fullstack-iam
+  namespace: openshift-gitops
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/rdiezsj/microshift-lab.git'
+    targetRevision: HEAD
+    path: apps/full-stack/iam
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: full-stack
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true  # <--- ArgoCD creará 'full-stack' si no existe
