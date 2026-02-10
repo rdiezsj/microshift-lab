@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: microshift-lab-root
-  namespace: openshift-gitops
+  namespace: argocd
 spec:
   project: default
   source:
@@ -11,7 +11,7 @@ spec:
     path: argocd-apps/  # La carpeta que contiene las apps hijas
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: openshift-gitops
+    namespace: argocd
   syncPolicy:
     automated:
       prune: true
